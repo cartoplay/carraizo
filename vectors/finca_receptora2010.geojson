@@ -1,4 +1,4 @@
-{
+var finca = {
 "type": "FeatureCollection",
 "name": "finca_receptora2010",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },

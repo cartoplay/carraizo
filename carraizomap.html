@@ -1,0 +1,167 @@
+<html>
+<head>
+    <title>Cuencas Analisis Gustavo</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin=""/>
+    <script src = "vectors/EBAS.geojson"></script>
+    <script src = "vectors/epa_facilities2015.geojson"></script>
+    <script src = "vectors/finca_receptora2010.geojson"></script>
+    <script src = "vectors/gomeras.geojson"></script>
+    <script src = "vectors/loiza_watershed.geojson"></script>
+    <script src = "vectors/pecuarias2008.geojson"></script>
+    <script src = "vectors/tanques_soterrados.geojson"></script>
+    <script src = "vectors/vertederos.geojson"></script>
+    <script src = "vectors/WWTM.geojson"></script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+    <style>
+        #map{ width: 900px; height: 500px; }
+        </style>
+</head>
+<body>
+    
+    <div id="map"></div>
+
+    <script>
+    
+    // intialize map
+    // var usgsStations = [50011400, 50063800, 50047600, 50136400, 50106500, 50091800, 50124700, 50055250, 50050300]
+    //var map = L.map('map').setView([18.5, -66.5], 8);
+    // var map = L.map('map',{
+    //     center: [18.5, -66.5],
+    //     zoom: 8,
+    //     layers: [OSM, eba]
+    // });
+
+
+    var OSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'})//.addTo(map);
+    var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+    var Esri_WorldShadedRelief = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
+        maxZoom: 20
+    });
+
+    var impaired = {
+        "color" : "#ff7800"}
+
+    var bestcond = {
+        "color" : "green"}  
+
+    var geojsonMarkerOptions = {
+        radius: 4,
+        fillColor: '#ff7800',
+        color: "#000",
+        weight: 1,
+        opacity: 1, 
+        fillopacity: 0.8
+    };
+
+    var ebamaker = {
+        radius: 2,
+        fillColor: 'red',
+        color: "red",
+        weight: 1,
+        opacity: 1, 
+        fillopacity: 0.8
+    };
+
+    var empresamaker = {
+        radius: 2.5,
+        fillColor: 'purple',
+        color: "purple",
+        weight: 1.5,
+        opacity: 1, 
+        fillopacity: 0.8
+    };
+
+    var usgsmarker = {
+        radius: 5,
+        fillColor: 'black',
+        color: "black",
+        weight: 3,
+        opacity: 1, 
+        fillopacity: 1
+    };
+    
+    function onEachFeature(feature, layer){
+    // if (feature.properties.site_no) {
+        layer.bindPopup(JSON.stringify(feature.properties.site_no)+ " " +
+        JSON.stringify(feature.properties.station_nm)
+        )
+    }
+
+    function onEachEmpresa(feature, layer){
+    // if (feature.properties.site_no) {
+        layer.bindPopup(JSON.stringify(feature.properties.TIPO_DE_EM)
+        )
+    }
+    // }
+
+    var eba = L.geoJSON(EBAS,{pointToLayer: function (feature, latlng){
+        return L.circleMarker(latlng,ebamaker);}
+    })   
+    var WTP = L.geoJSON(WWTP,{pointToLayer: function (feature, latlng){
+        return L.circleMarker(latlng,geojsonMarkerOptions);}
+    })  
+
+    var empresa = L.geoJSON(finca,{
+        pointToLayer: function (feature, latlng)
+        {return L.circleMarker(latlng,empresamaker);},
+        onEachFeature: onEachEmpresa
+        })  
+
+    // var USGSsite = L.geoJSON(usgssites,{
+    //     pointToLayer: function (feature, latlng){return L.circleMarker(latlng,usgsmarker);},
+    //     onEachFeature: onEachFeature
+    //     })
+
+    var Cuencas = L.layerGroup();
+
+    L.geoJSON(cuenca,{style:impaired}).bindPopup('Cuenca de Rio Grande de Loiza').addTo(Cuencas);  
+    // L.geoJSON(usgs50063800,{style:bestcond}).bindPopup('usgs50063800').addTo(Cuencas);
+    // L.geoJSON(usgs50047600,{style:bestcond}).bindPopup('usgs50047600').addTo(Cuencas);
+    // L.geoJSON(usgs50106500,{style:impaired}).bindPopup('usgs50106500').addTo(Cuencas);
+    // L.geoJSON(usgs50091800,{style:impaired}).bindPopup('usgs50091800').addTo(Cuencas);
+    // L.geoJSON(usgs50124700,{style:impaired}).bindPopup('usgs50124700').addTo(Cuencas);
+    // L.geoJSON(usgs50055250,{style:impaired}).bindPopup('usgs50055250').addTo(Cuencas);  
+    // L.geoJSON(usgs50050300,{style:impaired}).bindPopup('usgs50050300').addTo(Cuencas);   
+    // L.geoJSON(usgs50136400,{style:bestcond}).bindPopup('usgs50136400').addTo(Cuencas);         
+      
+
+    
+    var map = L.map('map',{
+        center: [18.25, -66.5],
+        zoom: 9,
+        maxZoom: 22,
+        minZoom: 8,
+        layers: [OSM],
+        attributionControl: true
+    });
+
+    attribution = map.attributionControl;
+    attribution.setPrefix('<BODY>Mapa interactivo hecho por Javier Arce Nazario utilizando <A href = "https://leafletjs.com/" </A> Leaflet </A>, datos de la <A href="https://www.acueductospr.com/" </A> AAA </A> y del <A href="https://waterdata.usgs.gov/pr/nwis/rt" </A> USGS </A></BODY>');
+
+    var baseMaps = {
+        "Mapa Basico": OSM,
+        "Imagenes ESRI": Esri_WorldImagery,
+        "Topografia": Esri_WorldShadedRelief
+    };
+
+    var overlayMaps = {
+        "Ebas": eba,
+        "WTP": WTP,
+        "Empresas Pecuarias" : empresa,
+        "Cuencas" : Cuencas
+    };
+
+    //debugger;
+
+    L.control.layers(baseMaps, overlayMaps).addTo(map);
+    OSM.addTo(map);
+</script>
+</body>
+</html>
